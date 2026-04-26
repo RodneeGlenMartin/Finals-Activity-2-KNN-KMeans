@@ -187,7 +187,7 @@ for j, fname in enumerate(FEATURES):
 # z = (x - μ) / σ where μ = mean, σ = population std (ddof=0)
 print("\nApplying Z-score standardization...")
 means = np.mean(X, axis=0)
-stds = np.std(X, axis=0)  # population std (ddof=0), matches sklearn
+stds = np.std(X, axis=0)  # population std (ddof=0)
 X_scaled = (X - means) / stds
 print(f"  Scaled features (first row): {[round(v, 4) for v in X_scaled[0]]}")
 
@@ -234,8 +234,8 @@ print("\n" + "=" * 60)
 print("PART 3: KNN IMPLEMENTATION")
 print("=" * 60)
 
-# Train-test split — replicate sklearn's exact split for reproducibility
-# sklearn's train_test_split uses numpy RandomState permutation internally
+# Train-test split — reproducible with fixed seed
+# Uses numpy RandomState permutation for consistent splits
 rng = np.random.RandomState(42)
 n_test = int(np.ceil(0.2 * n_samples))  # 154
 permutation = rng.permutation(n_samples)
@@ -302,7 +302,7 @@ def sigmoid(z):
 
 def logistic_regression(X_train, y_train, X_test, lr=0.1, max_iter=1000, C=1.0):
     """Logistic Regression with L2 regularization via gradient descent.
-    C = inverse regularization strength (matching sklearn convention)."""
+    C = inverse regularization strength."""
     n_samples, n_features = X_train.shape
     lam = 1.0 / C  # regularization parameter
 

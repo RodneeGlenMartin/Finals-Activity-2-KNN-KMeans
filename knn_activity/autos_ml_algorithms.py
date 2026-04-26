@@ -11,7 +11,7 @@ Class labels (derived from price for the supervised KNN task):
     Mid-range : $10,000 ≤ price < $20,000
     Luxury    : price ≥ $20,000
 
-Both algorithms are implemented in pure Python (no sklearn).
+Both algorithms are implemented in pure Python.
 """
 
 import csv
