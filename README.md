@@ -626,7 +626,7 @@ python autos_ml_algorithms.py
 |:---|:---|
 | **Rodnee Glen A. Martin** | Group 14 — Member |
 | **Renier P. Apal** | Group 14 — Member |
-| **Ear Lenser B. Bolansoy** | Group 14 — Member |
+| **Earl Lenser B. Bolansoy** | Group 14 — Member |
 
 ---
 
