@@ -39,7 +39,7 @@
 
 ## Overview
 
-This project implements two fundamental machine learning algorithms with full step-by-step computation to demonstrate a deep understanding of how they work internally. Both algorithms share the same core distance metric but serve fundamentally different purposes:
+This project implements two fundamental machine learning algorithms to demonstrate a deep understanding of how they work internally. Both algorithms share the same core distance metric but serve fundamentally different purposes:
 
 | | K-Nearest Neighbors | K-Means Clustering |
 |---|---|---|
@@ -64,7 +64,7 @@ This project implements two fundamental machine learning algorithms with full st
 ├── kmeans_dataset.csv            # Custom customer dataset (30 entries)
 ├── kmeans_steps_output.csv       # Full iteration-by-iteration computation log
 ├── kmeans_visualization.png      # Final cluster visualization
-├── Group14_KNN_KMeans.pptx       # Presentation: step-by-step walkthrough
+├── Group14_KNN_KMeans.pptx       # Presentation walkthrough
 │
 └── knn_activity/                 # Extended activities & real-world applications
     ├── autos_ml_algorithms.py    # KNN + K-Means on Automobile dataset
@@ -80,7 +80,7 @@ This project implements two fundamental machine learning algorithms with full st
     ├── featureCorrelationHeatmap.png   # Feature correlation heatmap
     ├── featuredistributionbyOutcome.png # Feature distribution by outcome
     ├── Autos_KNN_KMeans_Presentation.pptx  # Autos dataset presentation
-    ├── Autos_KNN_KMeans_StepByStep.pptx    # Autos step-by-step walkthrough
+    ├── Autos_KNN_KMeans_StepByStep.pptx    # Autos walkthrough
     └── visuals_autos/            # Generated visualizations for automobile dataset
 ```
 
