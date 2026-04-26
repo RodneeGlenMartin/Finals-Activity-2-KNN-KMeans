@@ -30,7 +30,7 @@ np.random.seed(42)
 
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH    = os.path.join(BASE_DIR, "autos-k-means.csv")
-VISUALS_DIR  = os.path.join(BASE_DIR, "visuals")
+VISUALS_DIR  = os.path.join(BASE_DIR, "visuals_autos")
 RESULTS_PATH = os.path.join(BASE_DIR, "results.json")
 os.makedirs(VISUALS_DIR, exist_ok=True)
 

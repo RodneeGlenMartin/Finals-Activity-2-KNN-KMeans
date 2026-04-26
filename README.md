@@ -80,7 +80,8 @@ This project implements two fundamental machine learning algorithms with full st
     ├── featureCorrelationHeatmap.png   # Feature correlation heatmap
     ├── featuredistributionbyOutcome.png # Feature distribution by outcome
     ├── Autos_KNN_KMeans_Presentation.pptx  # Autos dataset presentation
-    └── Autos_KNN_KMeans_StepByStep.pptx    # Autos step-by-step walkthrough
+    ├── Autos_KNN_KMeans_StepByStep.pptx    # Autos step-by-step walkthrough
+    └── visuals_autos/            # Generated visualizations for automobile dataset
 ```
 
 ---
@@ -203,6 +204,8 @@ The scatter plot shows all customers color-coded by tier, with:
 - **Dashed lines** — connections to the $K=3$ nearest neighbors
 - **Dashed circle** — the $K=3$ decision boundary (radius = distance to the 3rd nearest neighbor)
 
+![KNN Visualization](knn_visualization.png)
+
 ---
 
 ## Part 2 — K-Means Clustering
@@ -309,6 +312,8 @@ The algorithm discovered **5 customer segments**:
 | 🔵 **Cluster 4** | High income · High spending | (88.00, 89.60) |
 | 🔴 **Cluster 5** | Low income · Low spending | (17.67, 5.00) |
 
+![K-Means Visualization](kmeans_visualization.png)
+
 ---
 
 ## Extended Activity — Diabetes KNN Analysis
@@ -344,6 +349,10 @@ KNN relies on Euclidean distance, making it **extremely sensitive to feature sca
 $$z = \frac{x - \mu}{\sigma}$$
 
 Where $\mu$ is the feature mean and $\sigma$ is the standard deviation. This ensures all features contribute equally to the distance computation.
+
+![Feature Distribution by Outcome](knn_activity/featuredistributionbyOutcome.png)
+
+![Feature Correlation Heatmap](knn_activity/featureCorrelationHeatmap.png)
 
 ---
 
@@ -388,6 +397,8 @@ For $n = 8$ features (Pregnancies, Glucose, BloodPressure, SkinThickness, Insuli
 | **5** | **73.38%** | **75** | **24** | **17** | **38** |
 | 7 | 71.43% | 74 | 25 | 19 | 36 |
 
+![Confusion Matrices](knn_activity/ConfusionMatrices.png)
+
 ---
 
 ### Model Evaluation & Bias-Variance Tradeoff
@@ -417,6 +428,8 @@ The choice of K represents a fundamental **bias-variance tradeoff**:
 | KNN ($K=5$) | 73.38% | Non-parametric | Best KNN result; balanced bias-variance |
 | KNN ($K=7$) | 71.43% | Non-parametric | Smoother boundary; more robust to noise |
 | **Logistic Regression** | **75.32%** | Parametric | Fast, interpretable, highest accuracy |
+
+![KNN Results](knn_activity/knn_results.png)
 
 **Analysis:** Logistic Regression outperformed all KNN variants by **+1.94 percentage points**. This is consistent with the dataset's characteristics — Glucose, BMI, and Age have approximately linear relationships with the diabetic outcome, which a linear classifier captures efficiently. KNN would be more competitive on datasets with **highly non-linear class boundaries**.
 
@@ -494,11 +507,11 @@ python kmeans.py
 ```bash
 cd knn_activity
 
-# Automobile dataset
-python autos_ml_algorithms.py
-
 # Diabetes dataset
 python knn_diabetes.py
+
+# Automobile dataset
+python autos_ml_algorithms.py
 ```
 
 ---
@@ -531,4 +544,4 @@ python knn_diabetes.py
 
 ## License
 
-This project was created for academic purposes as part of a Computational Intelligence course (Finals Activity 2).
+This project was created for academic purposes as part of a Computational Science (CsElec01A) course (Finals Activity 2).
