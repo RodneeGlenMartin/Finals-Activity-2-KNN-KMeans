@@ -1,9 +1,9 @@
 # 🧠 K-Nearest Neighbors & K-Means Clustering
 
 > **Finals Activity 2: Computational Science (CsElec01A)**  
-> Step-by-step implementation of KNN and K-Means algorithms in Python, demonstrating foundational understanding of machine learning mechanics.
+> KNN and K-Means algorithms implemented in Python to demonstrate foundational understanding of machine learning mechanics.
 
-**Group 14** — Martin · Apal · Bolansoy
+**Group 14**
 
 ---
 
