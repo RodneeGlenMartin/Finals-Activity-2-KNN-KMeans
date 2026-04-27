@@ -30,7 +30,7 @@
   - [KNN Implementation & Results](#knn-implementation--results)
   - [Model Evaluation & Bias-Variance Tradeoff](#model-evaluation--bias-variance-tradeoff)
   - [KNN vs Logistic Regression](#bonus-knn-vs-logistic-regression)
-- [Extended Activity — Automobile Dataset](#extended-activity--automobile-dataset)
+
 - [Bias Analysis](#bias-analysis)
 - [Technologies Used](#technologies-used)
 - [Authors](#authors)
@@ -67,8 +67,6 @@ This project implements two fundamental machine learning algorithms to demonstra
 ├── Group14_KNN_KMeans.pptx       # Presentation walkthrough
 │
 └── knn_activity/                 # Extended activities & real-world applications
-    ├── autos_ml_algorithms.py    # KNN + K-Means on Automobile dataset
-    ├── autos-k-means.csv         # Automobile dataset (horsepower, mpg, price)
     ├── knn_diabetes.py           # KNN on Pima Diabetes dataset
     ├── diabetes-k-nn.csv         # Pima Indians Diabetes dataset (768 samples)
     ├── KNN_Distance_Computation.xlsx  # Manual distance computation spreadsheet
@@ -78,10 +76,7 @@ This project implements two fundamental machine learning algorithms to demonstra
     ├── knn_results.png           # Diabetes KNN results visualization
     ├── ConfusionMatrices.png     # Confusion matrix visualizations
     ├── featureCorrelationHeatmap.png   # Feature correlation heatmap
-    ├── featuredistributionbyOutcome.png # Feature distribution by outcome
-    ├── Autos_KNN_KMeans_Presentation.pptx  # Autos dataset presentation
-    ├── Autos_KNN_KMeans_StepByStep.pptx    # Autos walkthrough
-    └── visuals_autos/            # Generated visualizations for automobile dataset
+    └── featuredistributionbyOutcome.png # Feature distribution by outcome
 ```
 
 ---
@@ -447,127 +442,17 @@ The choice of K represents a fundamental **bias-variance tradeoff**:
 
 ---
 
-## Extended Activity — Automobile Dataset
-
-**File:** [`knn_activity/autos_ml_algorithms.py`](knn_activity/autos_ml_algorithms.py)  
-**Dataset:** 193 cars · 3 features · 3 price-tier classes
-
-| Component | Details |
-|:---|:---|
-| **Features** | Horsepower, Highway MPG, Price |
-| **Class Labels** | Economy ($< \$10{,}000$), Mid-range ($\$10{,}000 – \$20{,}000$), Luxury ($\geq \$20{,}000$) |
-| **Train / Test** | 144 training samples (75%) · 49 test samples (25%) |
-
-### Data Preprocessing: Min-Max Scaling
-
-Feature values span widely — Price ranges from \$5K to \$45K while MPG sits between 16–54. Without scaling, Price would dominate the Euclidean distance computation entirely.
-
-**Min-Max Scaling Formula:**
-
-$$x' = \frac{x - x_{\min}}{x_{\max} - x_{\min}}$$
-
-This maps every feature to $[0, 1]$, ensuring Horsepower, MPG, and Price contribute equally to distance.
-
-![Dataset Scatter](knn_activity/visuals_autos/dataset_scatter.png)
-
-### KNN Classification
-
-For each test car, Euclidean distance is computed to all 144 training cars (on the scaled features), the $K$ closest are selected, and majority vote determines the class.
-
-**Worked Example — New Car (HP = 100, Price = \$13,500):**
-
-| Car | Class | HP | Price (\$K) | Distance |
-|:---:|:---|:---:|:---:|:---:|
-| M1 | Mid-range | 101 | 12.95 | **1.14** |
-| M2 | Mid-range | 110 | 15.25 | **10.15** |
-| E1 | Economy | 70 | 6.30 | **30.85** |
-| E2 | Economy | 68 | 6.38 | 32.78 |
-| E3 | Economy | 62 | 5.35 | 38.86 |
-| L2 | Luxury | 176 | 32.25 | 78.28 |
-| L1 | Luxury | 182 | 30.76 | 83.80 |
-
-**K=3 Vote:** Mid-range = 2 (67%), Economy = 1 (33%), Luxury = 0 → **Predicted: Mid-range**
-
-$$Pr(Y = \text{Mid-range} \mid X) = \frac{2}{3} = 66.7\%$$
-
-#### KNN Results
-
-| K | Accuracy |
-|:---:|:---:|
-| 1 | varies |
-| 3 | varies |
-| **5** | **95.9%** |
-| 7 | varies |
-| 9 | varies |
-| 11 | varies |
-
-Best result at $K = 5$ with **95.9% accuracy** on 49 test cars. Most misclassifications occur at the Economy–Mid-range boundary where price ranges overlap.
-
-![KNN Results](knn_activity/visuals_autos/knn_results.png)
-
-![KNN Confusion Matrix](knn_activity/visuals_autos/knn_confusion.png)
-
-### K-Means Clustering
-
-K-Means groups the 193 cars into $K = 3$ clusters by iterating: assign each car to the nearest centroid, then recompute centroids as cluster means.
-
-**Iteration 1 — Distance Computation Example (Car E1: HP=70, Price=\$6.30K):**
-
-| | $C_1$ (70, 6.30) | $C_2$ (101, 12.95) | $C_3$ (182, 30.76) |
-|:---:|:---:|:---:|:---:|
-| $d(E1, C_j)$ | **0.00** | 31.71 | 114.64 |
-
-→ E1 assigned to **Cluster 1** (nearest centroid).
-
-**After Iteration 1 — New Centroids:**
-
-| Cluster | Members | New Centroid (HP, Price \$K) |
-|:---:|:---|:---:|
-| C1 (Economy) | E1, E2, E3 | (66.67, 6.01) |
-| C2 (Mid-range) | M1, M2 | (105.50, 14.10) |
-| C3 (Luxury) | L1, L2 | (179.00, 31.51) |
-
-**Iteration 2:** No car changed cluster → **Converged in 2 iterations** (on the 7-car example).
-
-On the full 193-car dataset, the algorithm converged in **12 iterations** with a final WCSS of **5.20** (scaled features).
-
-![K-Means Clusters](knn_activity/visuals_autos/kmeans_clusters.png)
-
-### Elbow Method — Choosing Optimal K
-
-The **Within-Cluster Sum of Squares (WCSS)** measures total compactness:
-
-$$\text{WCSS} = \sum_{\text{clusters}} \sum_{\text{points}} d(\text{point}, \text{centroid})^2$$
-
-Lower WCSS = tighter clusters. Running K-Means for $K = 1 \ldots 8$:
-
-- WCSS drops sharply from $K=1$ (19.96) → $K=2$ (8.77) → $K=3$ (5.20)
-- After $K=3$, the curve flattens — diminishing returns
-- The **elbow at $K=3$** confirms our 3 price-tier structure
-
-![Elbow Method](knn_activity/visuals_autos/elbow.png)
-
-![K-Means Convergence](knn_activity/visuals_autos/kmeans_convergence.png)
-
-### Key Findings
-
-- **K-Means rediscovered the price tiers** — clusters aligned almost perfectly with Economy / Mid-range / Luxury segments, without using labels
-- **KNN achieved 95.9%** — high accuracy because the 3 classes are well-separated after min-max scaling
-- **Min-max scaling was essential** — without it, Price (\$K) would dominate HP and MPG in every distance calculation
-
----
-
 ## Bias Analysis
 
 This project critically evaluates and mitigates algorithmic biases:
 
 | Bias Type | Issue | Mitigation Applied |
 |:---|:---|:---|
-| **Feature Scaling Bias** | Income (\$k) dominates over Visit Count; Insulin dominates over BMI | Min-max scaling (`autos_ml_algorithms.py`); Z-score standardization (`knn_diabetes.py`) |
+| **Feature Scaling Bias** | Income (\$k) dominates over Visit Count; Insulin dominates over BMI | Z-score standardization (`knn_diabetes.py`) |
 | **Centroid Initialization Bias** | Hardcoded centroids predetermine the final clusters | Random initialization with `random.seed(42)` for reproducibility |
 | **Confirmation Bias** | Cherry-picking K or initial centroids to match expected output | Multiple K values tested; Elbow Method used for K-Means |
 | **Class Imbalance Bias** | Majority class dominates KNN voting | Balanced custom datasets (8 per tier); acknowledged in diabetes analysis (500 vs 268) |
-| **Curse of Dimensionality** | Euclidean distance loses discriminative power in high dimensions | Feature selection (3 features for autos, 8 features for diabetes with scaling) |
+| **Curse of Dimensionality** | Euclidean distance loses discriminative power in high dimensions | Feature selection (8 features for diabetes with scaling) |
 | **Missing Data Bias** | Zeros treated as valid values skew distributions | Median imputation for physiologically impossible zeros |
 
 ---
@@ -597,9 +482,6 @@ cd knn_activity
 
 # Diabetes dataset
 python knn_diabetes.py
-
-# Automobile dataset
-python autos_ml_algorithms.py
 ```
 
 ---
