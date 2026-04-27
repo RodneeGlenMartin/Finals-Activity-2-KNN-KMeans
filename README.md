@@ -26,11 +26,12 @@
   - [Iteration & Convergence](#iteration--convergence)
   - [Final Clusters](#final-clusters--k-means-in-action)
 - [Extended Activity — Diabetes KNN Analysis](#extended-activity--diabetes-knn-analysis)
+  - [Dataset Overview](#dataset-overview)
   - [Data Preprocessing](#data-preprocessing)
-  - [KNN Implementation & Results](#knn-implementation--results)
-  - [Model Evaluation & Bias-Variance Tradeoff](#model-evaluation--bias-variance-tradeoff)
-  - [KNN vs Logistic Regression](#bonus-knn-vs-logistic-regression)
-
+  - [KNN Classification](#knn-classification)
+  - [Model Evaluation](#model-evaluation)
+  - [Analysis & Reflection](#analysis--reflection)
+- [Extended Activity — Automobile Dataset](#extended-activity--automobile-dataset)
 - [Bias Analysis](#bias-analysis)
 - [Technologies Used](#technologies-used)
 - [Authors](#authors)
@@ -67,16 +68,23 @@ This project implements two fundamental machine learning algorithms to demonstra
 ├── Group14_KNN_KMeans.pptx       # Presentation walkthrough
 │
 └── knn_activity/                 # Extended activities & real-world applications
-    ├── knn_diabetes.py           # KNN on Pima Diabetes dataset
+    ├── knn_model.py              # KNN on Pima Diabetes dataset
     ├── diabetes-k-nn.csv         # Pima Indians Diabetes dataset (768 samples)
-    ├── KNN_Distance_Computation.xlsx  # Manual distance computation spreadsheet
-    ├── KNN_Diabetes_Report.docx  # Written report for diabetes KNN analysis
-    ├── KNN_Diabetes_Report.pdf   # PDF version of the report
+    ├── kNN_guidelines.md         # Activity guidelines
     ├── knn-activity.pdf          # Activity instructions/rubric
-    ├── knn_results.png           # Diabetes KNN results visualization
-    ├── ConfusionMatrices.png     # Confusion matrix visualizations
-    ├── featureCorrelationHeatmap.png   # Feature correlation heatmap
-    └── featuredistributionbyOutcome.png # Feature distribution by outcome
+    ├── Homework_Report.docx      # Written report for diabetes KNN analysis
+    ├── Homework_Report.pdf       # PDF version of the report
+    ├── chart_01_class_distribution.png   # Class distribution pie chart
+    ├── chart_02_missing_values.png       # Missing value counts
+    ├── chart_03_euclidean_distances.png  # Distance bar chart
+    ├── chart_04_model_performance.png    # Accuracy/Precision/Recall/F1
+    ├── chart_05_confusion_matrices.png   # Confusion matrices for K=3,5,7
+    ├── chart_06_accuracy_vs_k.png        # Accuracy vs K curve
+    ├── autos_ml_algorithms.py    # KNN + K-Means on Automobile dataset
+    ├── autos-k-means.csv         # Automobile dataset (horsepower, mpg, price)
+    ├── Autos_KNN_KMeans_Presentation.pptx  # Autos dataset presentation
+    ├── Autos_KNN_KMeans_StepByStep.pptx    # Autos walkthrough
+    └── visuals_autos/            # Generated visualizations for automobile dataset
 ```
 
 ---
@@ -313,10 +321,27 @@ The algorithm discovered **5 customer segments**:
 
 ## Extended Activity — Diabetes KNN Analysis
 
-**Files:** [`knn_activity/knn_diabetes.py`](knn_activity/knn_diabetes.py) · [`KNN_Diabetes_Report.pdf`](knn_activity/KNN_Diabetes_Report.pdf)  
-**Dataset:** Pima Indians Diabetes Dataset — **768 samples**, 8 features, binary outcome (Diabetic / Non-diabetic)
+**Files:** [`knn_activity/knn_model.py`](knn_activity/knn_model.py) · [`Homework_Report.pdf`](knn_activity/Homework_Report.pdf)  
+**Dataset:** Pima Indians Diabetes Dataset — **768 records**, 8 features, binary outcome (Diabetic / Non-diabetic)
 
-> Full pipeline: data preprocessing, KNN classification, Logistic Regression comparison, and evaluation metrics.
+### Dataset Overview
+
+The dataset contains 768 patient records with 8 physiological features and a binary outcome:
+
+| Feature | Description |
+|---|---|
+| Pregnancies | Number of prior pregnancies |
+| Glucose | Plasma glucose concentration (2h oral glucose tolerance test) |
+| BloodPressure | Diastolic blood pressure (mm Hg) |
+| SkinThickness | Triceps skinfold thickness (mm) |
+| Insulin | 2-hour serum insulin (μU/mL) |
+| BMI | Body mass index ($\text{weight (kg)} / \text{height (m)}^2$) |
+| DiabetesPedigreeFunction | Diabetes hereditary risk score |
+| Age | Patient age (years) |
+
+**Class distribution:** 500 Non-diabetic (65.1%) vs 268 Diabetic (34.9%) — imbalanced toward the majority class.
+
+![Class Distribution](knn_activity/chart_01_class_distribution.png)
 
 ### Data Preprocessing
 
@@ -331,114 +356,150 @@ Several features contain physiologically impossible zeros (e.g., Glucose = 0, BM
 | SkinThickness | 227 | 29.56% | Median imputation |
 | Insulin | 374 | 48.70% | Median imputation |
 | BMI | 11 | 1.43% | Median imputation |
-| Pregnancies | 111 | 14.45% | Valid (0 = no prior pregnancies) |
 
 **Why median imputation?** Several features (especially Insulin) are heavily right-skewed. The median is robust to outliers and preserves the central tendency better than the mean. Row removal was rejected because it would eliminate ~50% of the dataset.
 
-#### Feature Scaling: Z-Score Standardization
+![Missing Values](knn_activity/chart_02_missing_values.png)
+
+#### Feature Scaling: Z-Score Standardisation
 
 KNN relies on Euclidean distance, making it **extremely sensitive to feature scale**. Without scaling, Insulin (range 0–846) would completely dominate BMI (range 0–67.1), producing meaningless distances.
 
-**Z-score standardization** transforms each feature to have $\mu = 0$ and $\sigma = 1$:
+**Z-score standardisation** transforms each feature to have $\mu = 0$ and $\sigma = 1$:
 
 $$z = \frac{x - \mu}{\sigma}$$
 
-Where $\mu$ is the feature mean and $\sigma$ is the standard deviation. This ensures all features contribute equally to the distance computation.
-
-![Feature Distribution by Outcome](knn_activity/featuredistributionbyOutcome.png)
-
-![Feature Correlation Heatmap](knn_activity/featureCorrelationHeatmap.png)
+Where $\mu$ is the feature mean and $\sigma$ is the population standard deviation. This ensures all features contribute equally to the distance computation.
 
 ---
 
-### KNN Implementation & Results
+### KNN Classification
 
 #### Train-Test Split
 
 The dataset (768 samples) was split **80/20** with a fixed random seed (42) for reproducibility:
-- **Training set:** 614 samples
-- **Test set:** 154 samples
+- **Training set:** 614 samples (80.0%)
+- **Test set:** 154 samples (20.0%)
 
 #### Distance Computation
 
-One test instance (true label = Non-diabetic) was selected. Euclidean distances were computed against all 614 training samples using the generalized formula:
+One test instance (true label = Non-diabetic) was selected. Euclidean distances were computed against 10 training samples for illustration, using the formula:
 
-$$d(\mathbf{p}, \mathbf{q}) = \sqrt{\sum_{i=1}^{n} (p_i - q_i)^2}$$
+$$d(\mathbf{p}, \mathbf{q}) = \sqrt{\sum_{i=1}^{8} (p_i - q_i)^2}$$
 
-For $n = 8$ features (Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age).
+**Worked Example — Training Sample #01 (Non-diabetic):**
 
-**Top 10 Nearest Neighbors:**
+| Feature | Test (z) | Train (z) | Diff | Diff² |
+|---|:---:|:---:|:---:|:---:|
+| Pregnancies | −0.84489 | −0.54792 | −0.29697 | 0.08819 |
+| Glucose | −1.07357 | −1.27082 | 0.19725 | 0.03891 |
+| BloodPressure | −0.52832 | −0.61104 | 0.08272 | 0.00684 |
+| SkinThickness | −0.69525 | −0.12613 | −0.56912 | 0.32390 |
+| Insulin | −0.54064 | −0.86499 | 0.32435 | 0.10520 |
+| BMI | −0.63388 | 0.63237 | −1.26625 | 1.60338 |
+| DiabetesPedigreeFunction | −0.92076 | 0.47453 | −1.39529 | 1.94685 |
+| Age | −1.04155 | −0.78629 | −0.25526 | 0.06516 |
+| **Sum of Squared Differences** | | | | **4.17843** |
 
-| Rank | Train Index | Euclidean Distance | Label |
+$$d = \sqrt{4.17843} = 2.04412$$
+
+#### Sorted Distances & Neighbour Identification
+
+| Rank | Sample # | Distance | Label |
 |:---:|:---:|:---:|:---|
-| 1 | 226 | 1.3237 | Diabetic (1) |
-| 2 | 521 | 1.3728 | Diabetic (1) |
-| 3 | 403 | 1.3952 | Non-diabetic (0) |
-| 4 | 430 | 1.4517 | Diabetic (1) |
-| 5 | 321 | 1.6715 | Diabetic (1) |
-| 6 | 90 | 1.6836 | Non-diabetic (0) |
-| 7 | 18 | 1.6851 | Diabetic (1) |
-| 8 | 213 | 1.7071 | Non-diabetic (0) |
-| 9 | 260 | 1.7184 | Non-diabetic (0) |
-| 10 | 412 | 1.7379 | Diabetic (1) |
+| 1 | #04 | 1.42024 | Non-diabetic (0) |
+| 2 | #01 | 2.04412 | Non-diabetic (0) |
+| 3 | #06 | 2.36497 | Non-diabetic (0) |
+| 4 | #09 | 2.84493 | Non-diabetic (0) |
+| 5 | #08 | 2.86041 | Diabetic (1) |
+| 6 | #03 | 3.32505 | Diabetic (1) |
+| 7 | #10 | 3.80292 | Diabetic (1) |
+| 8 | #07 | 4.10975 | Diabetic (1) |
+| 9 | #05 | 4.16433 | Diabetic (1) |
+| 10 | #02 | 4.80429 | Non-diabetic (0) |
 
-**K=3 Prediction:** Votes = [Diabetic, Diabetic, Non-diabetic] → Majority = **Diabetic** (True label was Non-diabetic — misclassified in this instance, illustrating KNN's sensitivity to local noise).
+**Predictions from these 10 samples:**
+- **K=3:** Neighbours = [0, 0, 0] → **Non-diabetic** (unanimous)
+- **K=5:** Neighbours = [0, 0, 0, 0, 1] → **Non-diabetic** (4 vs 1)
+- **K=7:** Neighbours = [0, 0, 0, 0, 1, 1, 1] → **Non-diabetic** (4 vs 3)
 
-#### Results for K = 3, 5, 7
+True label: Non-diabetic (0) — correctly classified at all K values. The full model uses all 614 training instances.
 
-| K | Accuracy | TN | FP | FN | TP |
-|:---:|:---:|:---:|:---:|:---:|:---:|
-| 3 | 70.78% | 74 | 25 | 20 | 35 |
-| **5** | **73.38%** | **75** | **24** | **17** | **38** |
-| 7 | 71.43% | 74 | 25 | 19 | 36 |
-
-![Confusion Matrices](knn_activity/ConfusionMatrices.png)
+![Euclidean Distances](knn_activity/chart_03_euclidean_distances.png)
 
 ---
 
-### Model Evaluation & Bias-Variance Tradeoff
+### Model Evaluation
 
-**Best K = 5** achieved the highest accuracy of **73.38%** (113 / 154 correct predictions).
+#### Accuracy and Metrics
 
-The choice of K represents a fundamental **bias-variance tradeoff**:
+The model was evaluated on all 154 test instances:
+
+| K | Accuracy | Precision | Recall | F1 Score | Correct / Total |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| **3** | **74.68%** | **0.6444** | **0.5577** | **0.5979** | **115 / 154** |
+| 5 | 72.08% | 0.5918 | 0.5577 | 0.5743 | 111 / 154 |
+| 7 | 74.68% | 0.6275 | 0.6154 | 0.6214 | 115 / 154 |
+
+![Model Performance](knn_activity/chart_04_model_performance.png)
+
+#### Confusion Matrices
+
+**K = 3** (Accuracy = 74.68%):
+
+| | Predicted: 0 | Predicted: 1 |
+|---|:---:|:---:|
+| **Actual: 0** | 86 (TN) | 16 (FP) |
+| **Actual: 1** | 23 (FN) | 29 (TP) |
+
+**K = 5** (Accuracy = 72.08%):
+
+| | Predicted: 0 | Predicted: 1 |
+|---|:---:|:---:|
+| **Actual: 0** | 82 (TN) | 20 (FP) |
+| **Actual: 1** | 23 (FN) | 29 (TP) |
+
+**K = 7** (Accuracy = 74.68%):
+
+| | Predicted: 0 | Predicted: 1 |
+|---|:---:|:---:|
+| **Actual: 0** | 83 (TN) | 19 (FP) |
+| **Actual: 1** | 20 (FN) | 32 (TP) |
+
+![Confusion Matrices](knn_activity/chart_05_confusion_matrices.png)
+
+#### Bias-Variance Tradeoff
+
+**Best K = 3** achieved the highest accuracy of **74.68%** with precision = 0.6444 and recall = 0.5577.
 
 | Scenario | K Value | Effect | Result |
 |:---|:---:|:---|:---|
-| **K too small** | $K=1$ | Memorizes training data; jagged decision boundary | High variance, **overfitting**, poor generalization |
-| **K optimal** | $K=5$ | Balances noise tolerance and local sensitivity | Best test accuracy (**73.38%**) |
+| **K too small** | $K=1$ | Memorises training data; jagged decision boundary | High variance, **overfitting**, poor generalisation |
+| **K optimal** | $K=3$ | Best balance between bias and variance on this dataset | Best test accuracy (**74.68%**) |
 | **K too large** | $K = N$ | Ignores local structure; always predicts majority class | High bias, **underfitting**, trivial accuracy |
 
-**Why does K=5 work best?**
-- $K=3$: Only 3 neighbors vote — noise and outliers have large influence (high variance).
-- $K=5$: Considers enough neighbors to be robust to noise while remaining sensitive to local patterns.
-- $K=7$: Begins to over-smooth, losing some local discriminative power.
+![Accuracy vs K](knn_activity/chart_06_accuracy_vs_k.png)
 
 ---
 
-### Bonus: KNN vs Logistic Regression
+### Analysis & Reflection
 
-| Algorithm | Accuracy | Type | Key Advantage |
-|:---|:---:|:---|:---|
-| KNN ($K=3$) | 70.78% | Non-parametric | No training phase; flexible boundary |
-| KNN ($K=5$) | 73.38% | Non-parametric | Best KNN result; balanced bias-variance |
-| KNN ($K=7$) | 71.43% | Non-parametric | Smoother boundary; more robust to noise |
-| **Logistic Regression** | **75.32%** | Parametric | Fast, interpretable, highest accuracy |
+**Strengths of KNN:**
+- Non-parametric — captures complex, non-linear decision boundaries
+- No training phase — stores the dataset and classifies at prediction time (lazy learner)
+- Interpretable — can directly inspect which training records influenced a decision
+- Naturally extends to multi-class problems
 
-![KNN Results](knn_activity/knn_results.png)
+**Limitations of KNN:**
+- $O(N \times D)$ prediction cost — must compute distances to all $N$ training instances
+- Entire training set must be stored in memory
+- Extremely sensitive to feature scale — standardisation is non-negotiable
+- Adversely affected by irrelevant features, class imbalance, and the **curse of dimensionality**
 
-**Analysis:** Logistic Regression outperformed all KNN variants by **+1.94 percentage points**. This is consistent with the dataset's characteristics — Glucose, BMI, and Age have approximately linear relationships with the diabetic outcome, which a linear classifier captures efficiently. KNN would be more competitive on datasets with **highly non-linear class boundaries**.
-
-**When KNN works well:**
-1. Dataset is small to medium-sized
-2. Decision boundary is irregular or non-linear
-3. Features are well-scaled and informative
-4. Interpretability is not required
-
-**When KNN is not appropriate:**
-1. Very large datasets (millions of records) — $O(n)$ prediction cost
-2. Many irrelevant or highly correlated features (**curse of dimensionality**)
-3. Real-time prediction is required
-4. A compact, deployable model is needed
+**Observations from this experiment:**
+- The model predicts Non-diabetic (class 0) more accurately than Diabetic (class 1), consistent with the class imbalance (500 vs 268)
+- Preprocessing was critical: without median imputation, zeros in Insulin and SkinThickness would distort every distance calculation
+- The per-feature squared differences in the distance computation reveal which features separated the test instance from each training sample
 
 ---
 
@@ -481,7 +542,10 @@ python kmeans.py
 cd knn_activity
 
 # Diabetes dataset
-python knn_diabetes.py
+python knn_model.py
+
+# Automobile dataset
+python autos_ml_algorithms.py
 ```
 
 ---
@@ -493,10 +557,9 @@ python knn_diabetes.py
 | **Python 3** | Core implementation language |
 | `csv` | Dataset I/O |
 | `math` | Euclidean distance: $d = \sqrt{\sum (p_i - q_i)^2}$ |
-| `matplotlib` | Visualizations and scatter plots |
+| `matplotlib` | Visualizations, scatter plots, bar charts |
 | `collections.Counter` | KNN majority voting |
-| `random` | Unbiased centroid initialization with seed |
-| `numpy` | Array operations (diabetes activity) |
+| `random` | Unbiased centroid initialization and train-test splits |
 
 ---
 
